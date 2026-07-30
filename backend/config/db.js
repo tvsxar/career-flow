@@ -1,4 +1,7 @@
 import mongoose from "mongoose";
+import { MongoClient } from "mongodb";
+
+const client = new MongoClient(process.env.MONGO_URI);
 
 async function connectDB() {
   try {
@@ -10,4 +13,5 @@ async function connectDB() {
   }
 };
 
+export { client };
 export default connectDB;
