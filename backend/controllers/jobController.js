@@ -1,6 +1,6 @@
 import Job from "../models/jobModel.js";
 
-async function getUserJobs(req, res) {
+export async function getUserJobs(req, res) {
   try {
     const userId = req.user.id;
     const jobs = await Job.find({ user: userId }).sort({ createdAt: -1 });
@@ -14,7 +14,7 @@ async function getUserJobs(req, res) {
   }
 }
 
-async function createJob(req, res) {
+export async function createJob(req, res) {
   try {
     const userId = req.user.id;
     const { company, salary, position, location, status } = req.body;
@@ -43,7 +43,7 @@ async function createJob(req, res) {
   }
 }
 
-async function updateJobStatus(req, res) {
+export async function updateJobStatus(req, res) {
   const userId = req.user.id;
   const { id } = req.params;
   const { status } = req.body;
@@ -69,7 +69,7 @@ async function updateJobStatus(req, res) {
   }
 }
 
-async function deleteJob(req, res) {
+export async function deleteJob(req, res) {
   const userId = req.user.id;
   const { id } = req.params;
 
