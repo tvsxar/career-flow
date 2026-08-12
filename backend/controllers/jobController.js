@@ -19,12 +19,6 @@ export async function createJob(req, res) {
     const userId = req.user.id;
     const { company, salary, position, location, status } = req.body;
 
-    if (!company || !salary || !position || !location) {
-      return res
-        .status(400)
-        .json({ message: "Please provide all required fields" });
-    }
-
     const job = await Job.create({
       user: userId,
       position,
@@ -47,12 +41,6 @@ export async function updateJobStatus(req, res) {
   const userId = req.user.id;
   const { id } = req.params;
   const { status } = req.body;
-
-  const allowedStatuses = ["applied", "interview", "offer", "rejected"];
-
-  if (!allowedStatuses.includes(status)) {
-    return res.status(400).json({ message: "Please provide proper status" });
-  }
 
   try {
     const job = await Job.findOne({ _id: id, user: userId });
