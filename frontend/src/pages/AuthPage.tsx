@@ -1,7 +1,8 @@
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
-import MainLayout from '../layouts/MainLayout';
+
 import { signIn, signUp } from '../lib/auth-client';
+import MainLayout from '../layouts/MainLayout';
 
 function AuthPage({ isLogin = true }: { isLogin?: boolean }) {
   const [formData, setFormData] = useState({
@@ -12,6 +13,8 @@ function AuthPage({ isLogin = true }: { isLogin?: boolean }) {
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+
+  const navigate = useNavigate();
 
   function handleInputChange(e: React.ChangeEvent<HTMLInputElement>) {
     const { name, value } = e.target;
@@ -54,7 +57,7 @@ function AuthPage({ isLogin = true }: { isLogin?: boolean }) {
         return;
       }
 
-      console.log(result.data);
+      navigate('/dashboard', { replace: true });
     } catch (err) {
       setError(
         err instanceof Error
@@ -173,14 +176,14 @@ function AuthPage({ isLogin = true }: { isLogin?: boolean }) {
                 <button
                   disabled={loading}
                   type="submit"
-                  className="w-full rounded-xl bg-[#9297D3] px-4 py-3 text-sm font-semibold text-[#111116] transition hover:bg-[#A3A7DC] active:scale-[0.99]"
+                  className="w-full rounded-xl bg-[#9297D3] px-4 py-3 text-sm font-semibold text-[#111116] transition hover:bg-[#A3A7DC] active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-60"
                 >
                   {loading ? 'Please wait...' : isLogin ? 'Sign in' : 'Sign up'}
                 </button>
               </form>
 
               {error && (
-                <p className="text-sm text-red-400">
+                <p className="mt-4 text-sm text-red-400">
                   {error}
                 </p>
               )}
