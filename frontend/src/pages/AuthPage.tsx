@@ -1,7 +1,71 @@
 import { Link } from 'react-router-dom';
+import { useState } from 'react';
 import MainLayout from '../layouts/MainLayout';
+import { signIn, signUp } from '../lib/auth-client';
 
 function AuthPage({ isLogin = true }: { isLogin?: boolean }) {
+  const [formData, setFormData] = useState({
+    username: '',
+    email: '',
+    password: '',
+    identifier: ''
+  });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+
+  function handleInputChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const { name, value } = e.target;
+
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value
+    }));
+  }
+
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    setLoading(true);
+    setError('');
+
+    try {
+      let result;
+
+      if (!isLogin) {
+        result = await signUp.email({
+          email: formData.email,
+          password: formData.password,
+          name: formData.username,
+          username: formData.username,
+        });
+      } else if (formData.identifier.includes('@')) {
+        result = await signIn.email({
+          email: formData.identifier,
+          password: formData.password,
+        });
+      } else {
+        result = await signIn.username({
+          username: formData.identifier,
+          password: formData.password,
+        });
+      }
+
+      if (result.error) {
+        setError(result.error.message ?? 'Authentication failed');
+        return;
+      }
+
+      console.log(result.data);
+    } catch (err) {
+      setError(
+        err instanceof Error
+          ? err.message
+          : 'Something went wrong'
+      );
+    } finally {
+      setLoading(false);
+    }
+  }
+
   return (
     <MainLayout>
       <div className="min-h-full px-4 py-10 sm:px-8 lg:px-16">
@@ -42,7 +106,9 @@ function AuthPage({ isLogin = true }: { isLogin?: boolean }) {
                 </p>
               </div>
 
-              <form className="space-y-5">
+              <form
+                onSubmit={handleSubmit}
+                className="space-y-5">
                 {!isLogin && (
                   <div>
                     <label
@@ -53,6 +119,9 @@ function AuthPage({ isLogin = true }: { isLogin?: boolean }) {
                     </label>
 
                     <input
+                      onChange={handleInputChange}
+                      value={formData.username}
+                      name="username"
                       id="username"
                       type="text"
                       placeholder="Enter your username"
@@ -70,6 +139,9 @@ function AuthPage({ isLogin = true }: { isLogin?: boolean }) {
                   </label>
 
                   <input
+                    value={isLogin ? formData.identifier : formData.email}
+                    onChange={handleInputChange}
+                    name={isLogin ? "identifier" : "email"}
                     id={isLogin ? "identifier" : "email"}
                     type="text"
                     placeholder={isLogin ? "Enter your username or email" : "Enter your email"}
@@ -88,6 +160,9 @@ function AuthPage({ isLogin = true }: { isLogin?: boolean }) {
                   </div>
 
                   <input
+                    value={formData.password}
+                    name="password"
+                    onChange={handleInputChange}
                     id="password"
                     type="password"
                     placeholder="Enter your password"
@@ -96,12 +171,19 @@ function AuthPage({ isLogin = true }: { isLogin?: boolean }) {
                 </div>
 
                 <button
+                  disabled={loading}
                   type="submit"
                   className="w-full rounded-xl bg-[#9297D3] px-4 py-3 text-sm font-semibold text-[#111116] transition hover:bg-[#A3A7DC] active:scale-[0.99]"
                 >
-                  {isLogin ? 'Sign in' : 'Sign up'}
+                  {loading ? 'Please wait...' : isLogin ? 'Sign in' : 'Sign up'}
                 </button>
               </form>
+
+              {error && (
+                <p className="text-sm text-red-400">
+                  {error}
+                </p>
+              )}
 
               <p className="mt-8 text-center text-sm text-zinc-500">
                 {isLogin ? "Don't have an account?" : "Already have an account?"}{" "}
