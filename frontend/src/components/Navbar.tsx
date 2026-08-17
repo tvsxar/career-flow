@@ -1,6 +1,16 @@
+import { useNavigate } from 'react-router-dom';
+import { useSession, signOut } from '../lib/auth-client';
 import AuthButtons from './AuthButtons';
+import UserButtons from './UserButtons';
 
 export default function Navbar() {
+    const { data: session, isPending } = useSession();
+    const navigate = useNavigate();
+
+    async function handleSignOut() {
+        await signOut();
+        navigate('/', { replace: true });
+    }
 
     return (
         <nav
@@ -11,9 +21,11 @@ export default function Navbar() {
                 Hire<span className="text-[#9297D3] drop-shadow-[0_0_4px_rgba(146,151,211,0.8)]">path</span>
             </div>
 
-            {false
-                ? <div className="h-8 w-32 bg-zinc-300 rounded animate-pulse" />
-                : <AuthButtons />}
+            {isPending
+                ? <div className="h-8 w-32 bg-[#292933] rounded animate-pulse" />
+                : session ?
+                    <UserButtons signOut={handleSignOut} username={session.user.username ?? 'User'} />
+                    : <AuthButtons />}
         </nav>
     )
 }
