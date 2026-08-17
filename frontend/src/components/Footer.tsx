@@ -1,5 +1,5 @@
 export default function Footer() {
-    const linkClasses = "hover:text-[#A78BBD] transition hover:drop-shadow-[0_0_4px_rgba(167,139,189,.55)]";
+    const linkClasses = "hover:text-[#9297D3] transition hover:drop-shadow-[0_0_4px_rgba(146,151,211,0.8)]";
 
     return (
         <footer className="border-t border-gray-100/30 py-8 px-6 text-gray-400">
@@ -8,7 +8,7 @@ export default function Footer() {
                 <div className="flex flex-col items-center sm:items-start">
                     <h3 className="font-bold text-lg text-[#F4F4F5] tracking-wide">
                         Hire
-                        <span className="text-[#A78BBD] drop-shadow-[0_0_4px_rgba(167,139,189,.55)]">
+                        <span className="text-[#9297D3] drop-shadow-[0_0_4px_rgba(146,151,211,0.8)]">
                             path
                         </span>
                     </h3>
