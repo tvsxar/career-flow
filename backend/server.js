@@ -11,8 +11,13 @@ const PORT = process.env.PORT || 1099;
 
 await connectDB();
 
+app.use(
+  cors({
+    origin: process.env.CLIENT_URL || "http://localhost:5173",
+    credentials: true,
+  }),
+);
 app.all("/api/auth/*splat", toNodeHandler(auth));
-app.use(cors());
 app.use(express.json());
 
 // routes
