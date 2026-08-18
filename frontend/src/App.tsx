@@ -1,10 +1,8 @@
+import AppRouter from './components/AppRouter';
+
 function App() {
 
-  return (
-    <>
-      <h1>Career Flow</h1>
-    </>
-  )
+  return <AppRouter />;
 }
 
 export default App
