@@ -2,17 +2,48 @@ import { useState, useEffect } from 'react';
 import { Navigate } from 'react-router-dom';
 
 import { useSession } from '../lib/auth-client';
-import type { Job } from '../types/job';
-import { getJobs } from '../api/jobsApi';
+import type { Job, JobData } from '../types/job';
+import { getJobs, createJob } from '../api/jobsApi';
 
 import MainLayout from '../layouts/MainLayout';
 import JobsList from '../components/JobsList';
+import JobModal from '../components/JobModal';
 
 function DashboardPage() {
     const { data: session, isPending } = useSession();
     const [jobs, setJobs] = useState<Job[]>([]);
     const [loading, setLoading] = useState(false);
+    const [isCreating, setIsCreating] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const [creatingError, setCreatingError] = useState('');
+    const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+
+    function toggleModal() {
+        if(!isModalOpen) setCreatingError('');
+        setIsModalOpen(prev => !prev)
+    }
+
+    async function addNewJob(jobData: JobData) {
+        setIsCreating(true);
+        setCreatingError('')
+
+        try {
+            const job = await createJob(jobData);
+            setJobs(prev => [job, ...prev]);
+
+            return true;
+        } catch (err) {
+            setCreatingError(
+                err instanceof Error
+                    ? err.message
+                    : "Failed to create job"
+            );
+
+            return false;
+        } finally {
+            setIsCreating(false);
+        }
+    }
 
     useEffect(() => {
         if (!session) return;
@@ -57,6 +88,26 @@ function DashboardPage() {
     return (
         <MainLayout>
             <div className="px-4 py-10 sm:px-8 lg:px-16">
+                <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                    <div>
+                        <h1 className="text-2xl font-semibold tracking-tight text-zinc-100 sm:text-3xl">
+                            Your applications
+                        </h1>
+
+                        <p className="mt-2 text-sm text-zinc-500">
+                            Track and manage your job applications.
+                        </p>
+                    </div>
+
+                    <button
+                        type="button"
+                        onClick={toggleModal}
+                        className="cursor-pointer rounded-xl bg-[#9297D3] px-4 py-2.5 text-sm font-semibold text-[#111116] transition hover:bg-[#A3A7DC] active:scale-[0.98]"
+                    >
+                        + Add job
+                    </button>
+                </div>
+
                 {loading ? (
                     <div className="grid gap-4 grid-cols-[repeat(auto-fit,minmax(280px,1fr))]">
                         {[1, 2, 3, 4].map((item) => (
@@ -83,6 +134,8 @@ function DashboardPage() {
                 ) : (
                     <JobsList jobs={jobs} />
                 )}
+
+                {isModalOpen && <JobModal error={creatingError} addNewJob={addNewJob} loading={isCreating} onClose={toggleModal} />}
             </div>
         </MainLayout>
     );
