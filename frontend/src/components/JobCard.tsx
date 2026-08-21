@@ -6,13 +6,22 @@ interface JobCardProps {
     updateStatus: (jobId: string, jobStatus: JobStatus) => Promise<void>;
     updatingErrorId: null | string;
     updatingError: null | string;
+    deletingId: string;
+    deletingError: string | null;
+    deletingErrorId: string | null;
+    onDelete: (jobId: string) => Promise<void>;
 }
 
-function JobsCard({ job, updatingId, updateStatus, updatingErrorId, updatingError }: JobCardProps) {
+function JobsCard({ job, updatingId, updateStatus, updatingErrorId, updatingError, deletingId, deletingError, deletingErrorId, onDelete }: JobCardProps) {
     const isUpdating = updatingId === job._id;
+    const isDeleting = deletingId === job._id;
 
     async function handleSelectChange(e: React.ChangeEvent<HTMLSelectElement>) {
         await updateStatus(job._id, e.target.value as JobStatus);
+    }
+
+    async function handleDelete() {
+        await onDelete(job._id);
     }
 
     return (
@@ -58,7 +67,7 @@ function JobsCard({ job, updatingId, updateStatus, updatingErrorId, updatingErro
                     <div className="flex items-center justify-between gap-3">
                         <select
                             value={job.status}
-                            disabled={isUpdating}
+                            disabled={isUpdating || isDeleting}
                             onChange={handleSelectChange}
                             className="rounded-lg disabled:cursor-not-allowed disabled:opacity-60 text-center border border-[#292933] appearance-none cursor-pointer bg-[#111116] px-3 py-2 text-xs text-zinc-300 outline-none transition focus:border-[#9297D3]/60"
                         >
@@ -76,16 +85,23 @@ function JobsCard({ job, updatingId, updateStatus, updatingErrorId, updatingErro
 
                         <button
                             type="button"
-                            disabled={isUpdating}
+                            disabled={isUpdating || isDeleting}
+                            onClick={handleDelete}
                             className="cursor-pointer disabled:cursor-not-allowed disabled:opacity-60 rounded-lg px-3 py-2 text-xs font-medium text-zinc-500 transition hover:bg-red-400/10 hover:text-red-400"
                         >
-                            Delete
+                            {isDeleting ? 'Deleting...' : 'Delete'}
                         </button>
                     </div>
 
                     {updatingErrorId === job._id && updatingError && (
                         <p className="mt-3 text-xs text-red-400">
                             {updatingError}
+                        </p>
+                    )}
+
+                    {deletingErrorId === job._id && deletingError && (
+                        <p className="mt-3 text-xs text-red-400">
+                            {deletingError}
                         </p>
                     )}
                 </div>

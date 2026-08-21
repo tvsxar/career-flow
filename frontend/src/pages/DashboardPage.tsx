@@ -3,7 +3,7 @@ import { Navigate } from 'react-router-dom';
 
 import { useSession } from '../lib/auth-client';
 import type { Job, JobData, JobStatus } from '../types/job';
-import { getJobs, createJob, updateJobStatus } from '../api/jobsApi';
+import { getJobs, createJob, updateJobStatus, deleteJob } from '../api/jobsApi';
 
 import MainLayout from '../layouts/MainLayout';
 import JobsList from '../components/JobsList';
@@ -20,6 +20,9 @@ function DashboardPage() {
     const [updatingId, setUpdatingId] = useState<string>('');
     const [updatingError, setUpdatingError] = useState<string | null>(null);
     const [updatingErrorId, setUpdatingErrorId] = useState<string | null>(null);
+    const [deletingId, setDeletingId] = useState<string>('');
+    const [deletingError, setDeletingError] = useState<string | null>(null);
+    const [deletingErrorId, setDeletingErrorId] = useState<string | null>(null);
 
     function toggleModal() {
         if (!isModalOpen) setCreatingError(null);
@@ -67,6 +70,28 @@ function DashboardPage() {
             setUpdatingErrorId(jobId);
         } finally {
             setUpdatingId('');
+        }
+    }
+
+    async function deleteSelectedJob(jobId: string) {
+        setDeletingId(jobId);
+        setDeletingError(null);
+        setDeletingErrorId(null);
+
+        try {
+            await deleteJob(jobId);
+
+            setJobs(prev => prev.filter(job => job._id !== jobId));
+        } catch (err) {
+            setDeletingError(
+                err instanceof Error
+                    ? err.message
+                    : "Failed to deleting job"
+            );
+
+            setDeletingErrorId(jobId);
+        } finally {
+            setDeletingId('');
         }
     }
 
@@ -157,7 +182,7 @@ function DashboardPage() {
                         </p>
                     </div>
                 ) : (
-                    <JobsList updatingError={updatingError} updatingErrorId={updatingErrorId} updateStatus={updateStatus} updatingId={updatingId} jobs={jobs} />
+                    <JobsList onDelete={deleteSelectedJob} deletingErrorId={deletingErrorId} deletingId={deletingId} deletingError={deletingError} updatingError={updatingError} updatingErrorId={updatingErrorId} updateStatus={updateStatus} updatingId={updatingId} jobs={jobs} />
                 )}
 
                 {isModalOpen && <JobModal error={creatingError} addNewJob={addNewJob} loading={isCreating} onClose={toggleModal} />}
