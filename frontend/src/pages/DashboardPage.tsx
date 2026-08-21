@@ -3,6 +3,7 @@ import { Navigate } from 'react-router-dom';
 
 import { useSession } from '../lib/auth-client';
 import type { Job, JobData, JobStatus } from '../types/job';
+import type { UpdateJobState, DeleteJobState } from '../types/jobActions';
 import { getJobs, createJob, updateJobStatus, deleteJob } from '../api/jobsApi';
 
 import MainLayout from '../layouts/MainLayout';
@@ -86,7 +87,7 @@ function DashboardPage() {
             setDeletingError(
                 err instanceof Error
                     ? err.message
-                    : "Failed to deleting job"
+                    : "Failed to delete job"
             );
 
             setDeletingErrorId(jobId);
@@ -182,7 +183,21 @@ function DashboardPage() {
                         </p>
                     </div>
                 ) : (
-                    <JobsList onDelete={deleteSelectedJob} deletingErrorId={deletingErrorId} deletingId={deletingId} deletingError={deletingError} updatingError={updatingError} updatingErrorId={updatingErrorId} updateStatus={updateStatus} updatingId={updatingId} jobs={jobs} />
+                    <JobsList
+                        jobs={jobs}
+                        updateJob={{
+                            id: updatingId,
+                            error: updatingError,
+                            errorId: updatingErrorId,
+                            onUpdate: updateStatus,
+                        }}
+                        deleteJob={{
+                            id: deletingId,
+                            error: deletingError,
+                            errorId: deletingErrorId,
+                            onDelete: deleteSelectedJob,
+                        }}
+                    />
                 )}
 
                 {isModalOpen && <JobModal error={creatingError} addNewJob={addNewJob} loading={isCreating} onClose={toggleModal} />}

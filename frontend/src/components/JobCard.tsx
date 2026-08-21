@@ -1,27 +1,25 @@
-import type { Job, JobStatus } from '../types/job';
+import type { Job, JobStatus } from "../types/job";
+import type {
+    UpdateJobState,
+    DeleteJobState,
+} from "../types/jobActions";
 
 interface JobCardProps {
     job: Job;
-    updatingId: string;
-    updateStatus: (jobId: string, jobStatus: JobStatus) => Promise<void>;
-    updatingErrorId: null | string;
-    updatingError: null | string;
-    deletingId: string;
-    deletingError: string | null;
-    deletingErrorId: string | null;
-    onDelete: (jobId: string) => Promise<void>;
+    updateJob: UpdateJobState;
+    deleteJob: DeleteJobState;
 }
 
-function JobsCard({ job, updatingId, updateStatus, updatingErrorId, updatingError, deletingId, deletingError, deletingErrorId, onDelete }: JobCardProps) {
-    const isUpdating = updatingId === job._id;
-    const isDeleting = deletingId === job._id;
+function JobsCard({ job, updateJob, deleteJob }: JobCardProps) {
+    const isUpdating = updateJob.id === job._id;
+    const isDeleting = deleteJob.id === job._id;
 
     async function handleSelectChange(e: React.ChangeEvent<HTMLSelectElement>) {
-        await updateStatus(job._id, e.target.value as JobStatus);
+        await updateJob.onUpdate(job._id, e.target.value as JobStatus);
     }
 
     async function handleDelete() {
-        await onDelete(job._id);
+        await deleteJob.onDelete(job._id);
     }
 
     return (
@@ -93,15 +91,15 @@ function JobsCard({ job, updatingId, updateStatus, updatingErrorId, updatingErro
                         </button>
                     </div>
 
-                    {updatingErrorId === job._id && updatingError && (
+                    {updateJob.errorId === job._id && updateJob.error && (
                         <p className="mt-3 text-xs text-red-400">
-                            {updatingError}
+                            {updateJob.error}
                         </p>
                     )}
 
-                    {deletingErrorId === job._id && deletingError && (
+                    {deleteJob.errorId === job._id && deleteJob.error && (
                         <p className="mt-3 text-xs text-red-400">
-                            {deletingError}
+                            {deleteJob.error}
                         </p>
                     )}
                 </div>

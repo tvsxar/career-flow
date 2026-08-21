@@ -1,26 +1,34 @@
-import type { Job, JobStatus } from '../types/job';
-import JobCard from '../components/JobCard';
+import type { Job } from "../types/job";
+import type {
+  UpdateJobState,
+  DeleteJobState,
+} from "../types/jobActions";
+
+import JobCard from "./JobCard";
 
 interface JobsListProps {
-    jobs: Job[];
-    updatingId: string;
-    updateStatus: (jobId: string, jobStatus: JobStatus) => Promise<void>;
-    updatingErrorId: null | string;
-    updatingError: null | string;
-    deletingId: string;
-    deletingError: string | null;
-    deletingErrorId: string | null;
-    onDelete: (jobId: string) => Promise<void>;
+  jobs: Job[];
+  updateJob: UpdateJobState;
+  deleteJob: DeleteJobState;
 }
 
-function JobsList({ jobs, updatingId, updateStatus, updatingErrorId, updatingError, deletingId, deletingError, deletingErrorId, onDelete }: JobsListProps) {
-    return (
-        <ul className="grid gap-4 grid-cols-[repeat(auto-fit,minmax(280px,1fr))]">
-            {jobs.map((job) => (
-                <JobCard onDelete={onDelete} deletingErrorId={deletingErrorId} deletingId={deletingId} deletingError={deletingError} updatingError={updatingError} updatingErrorId={updatingErrorId} updatingId={updatingId} updateStatus={updateStatus} key={job._id} job={job} />
-            ))}
-        </ul>
-    )
+function JobsList({
+  jobs,
+  updateJob,
+  deleteJob,
+}: JobsListProps) {
+  return (
+    <ul className="grid gap-4 grid-cols-[repeat(auto-fit,minmax(280px,1fr))]">
+      {jobs.map((job) => (
+        <JobCard
+          key={job._id}
+          job={job}
+          updateJob={updateJob}
+          deleteJob={deleteJob}
+        />
+      ))}
+    </ul>
+  );
 }
 
-export default JobsList
+export default JobsList;
