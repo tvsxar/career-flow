@@ -1,11 +1,19 @@
-import type { Job } from '../types/job';
+import type { Job, JobStatus } from '../types/job';
 import JobCard from '../components/JobCard';
 
-function JobsList({ jobs }: { jobs: Job[] }) {
+interface JobsListProps {
+    jobs: Job[];
+    updatingId: string;
+    updateStatus: (jobId: string, jobStatus: JobStatus) => Promise<void>;
+    updatingErrorId: null | string;
+    updatingError: null | string;
+}
+
+function JobsList({ jobs, updatingId, updateStatus, updatingErrorId, updatingError }: JobsListProps) {
     return (
         <ul className="grid gap-4 grid-cols-[repeat(auto-fit,minmax(280px,1fr))]">
             {jobs.map((job) => (
-                <JobCard key={job._id} job={job} />
+                <JobCard updatingError={updatingError} updatingErrorId={updatingErrorId} updatingId={updatingId} updateStatus={updateStatus} key={job._id} job={job} />
             ))}
         </ul>
     )

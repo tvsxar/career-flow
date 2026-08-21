@@ -6,7 +6,7 @@ interface JobModalProps {
     onClose: () => void;
     loading: boolean;
     addNewJob: (jobData: JobData) => Promise<boolean>;
-    error: string;
+    error: null | string;
 }
 
 function JobModal({ onClose, loading, addNewJob, error }: JobModalProps) {

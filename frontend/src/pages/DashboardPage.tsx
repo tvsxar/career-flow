@@ -2,8 +2,8 @@ import { useState, useEffect } from 'react';
 import { Navigate } from 'react-router-dom';
 
 import { useSession } from '../lib/auth-client';
-import type { Job, JobData } from '../types/job';
-import { getJobs, createJob } from '../api/jobsApi';
+import type { Job, JobData, JobStatus } from '../types/job';
+import { getJobs, createJob, updateJobStatus } from '../api/jobsApi';
 
 import MainLayout from '../layouts/MainLayout';
 import JobsList from '../components/JobsList';
@@ -15,17 +15,20 @@ function DashboardPage() {
     const [loading, setLoading] = useState(false);
     const [isCreating, setIsCreating] = useState(false);
     const [error, setError] = useState<string | null>(null);
-    const [creatingError, setCreatingError] = useState('');
+    const [creatingError, setCreatingError] = useState<string | null>(null);
     const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+    const [updatingId, setUpdatingId] = useState<string>('');
+    const [updatingError, setUpdatingError] = useState<string | null>(null);
+    const [updatingErrorId, setUpdatingErrorId] = useState<string | null>(null);
 
     function toggleModal() {
-        if(!isModalOpen) setCreatingError('');
+        if (!isModalOpen) setCreatingError(null);
         setIsModalOpen(prev => !prev)
     }
 
     async function addNewJob(jobData: JobData) {
         setIsCreating(true);
-        setCreatingError('')
+        setCreatingError(null)
 
         try {
             const job = await createJob(jobData);
@@ -42,6 +45,28 @@ function DashboardPage() {
             return false;
         } finally {
             setIsCreating(false);
+        }
+    }
+
+    async function updateStatus(jobId: string, jobStatus: JobStatus) {
+        setUpdatingId(jobId);
+        setUpdatingError(null);
+        setUpdatingErrorId(null);
+
+        try {
+            const updatedJob = await updateJobStatus(jobId, jobStatus);
+
+            setJobs(prev => prev.map(job => job._id === jobId ? updatedJob : job));
+        } catch (err) {
+            setUpdatingError(
+                err instanceof Error
+                    ? err.message
+                    : "Failed to update job status"
+            );
+
+            setUpdatingErrorId(jobId);
+        } finally {
+            setUpdatingId('');
         }
     }
 
@@ -132,7 +157,7 @@ function DashboardPage() {
                         </p>
                     </div>
                 ) : (
-                    <JobsList jobs={jobs} />
+                    <JobsList updatingError={updatingError} updatingErrorId={updatingErrorId} updateStatus={updateStatus} updatingId={updatingId} jobs={jobs} />
                 )}
 
                 {isModalOpen && <JobModal error={creatingError} addNewJob={addNewJob} loading={isCreating} onClose={toggleModal} />}
