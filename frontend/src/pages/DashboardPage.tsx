@@ -3,12 +3,13 @@ import { Navigate } from 'react-router-dom';
 
 import { useSession } from '../lib/auth-client';
 import type { Job, JobData, JobStatus } from '../types/job';
-import type { UpdateJobState, DeleteJobState } from '../types/jobActions';
 import { getJobs, createJob, updateJobStatus, deleteJob } from '../api/jobsApi';
+import { getStatusCounts, getInterviewRate, getAverageSalary, getTopLocation } from '../utils/jobAnalytics';
 
 import MainLayout from '../layouts/MainLayout';
 import JobsList from '../components/JobsList';
 import JobModal from '../components/JobModal';
+import AnalyticsGrid from '../components/AnalyticsGrid';
 
 function DashboardPage() {
     const { data: session, isPending } = useSession();
@@ -24,6 +25,12 @@ function DashboardPage() {
     const [deletingId, setDeletingId] = useState<string>('');
     const [deletingError, setDeletingError] = useState<string | null>(null);
     const [deletingErrorId, setDeletingErrorId] = useState<string | null>(null);
+
+    // Analytics for grid
+    const statusCounts = getStatusCounts(jobs);
+    const interviewRate = getInterviewRate(jobs);
+    const averageSalary = getAverageSalary(jobs);
+    const topLocation = getTopLocation(jobs);
 
     function toggleModal() {
         if (!isModalOpen) setCreatingError(null);
@@ -183,21 +190,24 @@ function DashboardPage() {
                         </p>
                     </div>
                 ) : (
-                    <JobsList
-                        jobs={jobs}
-                        updateJob={{
-                            id: updatingId,
-                            error: updatingError,
-                            errorId: updatingErrorId,
-                            onUpdate: updateStatus,
-                        }}
-                        deleteJob={{
-                            id: deletingId,
-                            error: deletingError,
-                            errorId: deletingErrorId,
-                            onDelete: deleteSelectedJob,
-                        }}
-                    />
+                    <div>
+                        <AnalyticsGrid applicationsCount={jobs.length} statusCounts={statusCounts} interviewRate={interviewRate} averageSalary={averageSalary} topLocation={topLocation} />
+                        <JobsList
+                            jobs={jobs}
+                            updateJob={{
+                                id: updatingId,
+                                error: updatingError,
+                                errorId: updatingErrorId,
+                                onUpdate: updateStatus,
+                            }}
+                            deleteJob={{
+                                id: deletingId,
+                                error: deletingError,
+                                errorId: deletingErrorId,
+                                onDelete: deleteSelectedJob,
+                            }}
+                        />
+                    </div>
                 )}
 
                 {isModalOpen && <JobModal error={creatingError} addNewJob={addNewJob} loading={isCreating} onClose={toggleModal} />}
