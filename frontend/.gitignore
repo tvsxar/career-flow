@@ -12,6 +12,7 @@ dist
 dist-ssr
 *.local
 .env
+.env.e2e
 
 # Editor directories and files
 .vscode/*
@@ -23,3 +24,10 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Playwright
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+/playwright/.auth/
