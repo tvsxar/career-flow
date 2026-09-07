@@ -6,7 +6,9 @@
   "scripts": {
     "test": "vitest",
     "start": "node server.js",
-    "dev": "nodemon server.js"
+    "dev": "nodemon server.js",
+    "dev:e2e": "NODE_ENV=e2e nodemon server.js",
+    "test:e2e:setup": "NODE_ENV=e2e node tests/e2e/setupE2E.js"
   },
   "keywords": [],
   "author": "",

@@ -1,7 +1,7 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 
-import { signIn, signUp } from '../lib/auth-client';
+import { signIn, signUp, useSession } from '../lib/auth-client';
 import MainLayout from '../layouts/MainLayout';
 
 function AuthPage({ isLogin = true }: { isLogin?: boolean }) {
@@ -15,6 +15,7 @@ function AuthPage({ isLogin = true }: { isLogin?: boolean }) {
   const [error, setError] = useState('');
 
   const navigate = useNavigate();
+  const { refetch } = useSession();
 
   function handleInputChange(e: React.ChangeEvent<HTMLInputElement>) {
     const { name, value } = e.target;
@@ -39,38 +40,27 @@ function AuthPage({ isLogin = true }: { isLogin?: boolean }) {
           password: formData.password,
           name: formData.username,
           username: formData.username,
-        },
-          {
-            onSuccess: () => {
-              navigate('/dashboard', { replace: true });
-            },
-          },);
+        });
       } else if (formData.identifier.includes('@')) {
         result = await signIn.email({
           email: formData.identifier,
           password: formData.password,
-        },
-          {
-            onSuccess: () => {
-              navigate('/dashboard', { replace: true });
-            },
-          },);
+        });
       } else {
         result = await signIn.username({
           username: formData.identifier,
           password: formData.password,
-        },
-          {
-            onSuccess: () => {
-              navigate('/dashboard', { replace: true });
-            },
-          },);
+        });
       }
 
       if (result.error) {
         setError(result.error.message ?? 'Authentication failed');
         return;
       }
+
+      await refetch();
+
+      navigate("/dashboard", { replace: true });
     } catch (err) {
       setError(
         err instanceof Error
