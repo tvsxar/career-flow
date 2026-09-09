@@ -84,4 +84,8 @@ jobs:
         working-directory: ./frontend
         env:
           MONGO_URI: ${{ secrets.E2E_MONGO_URI }}
+          BETTER_AUTH_SECRET: ${{ secrets.E2E_BETTER_AUTH_SECRET }}
+          BETTER_AUTH_URL: ${{ secrets.E2E_BETTER_AUTH_URL }}
+          CLIENT_URL: ${{ secrets.E2E_CLIENT_URL }}
+          PORT: 1100
         run: npx playwright test
