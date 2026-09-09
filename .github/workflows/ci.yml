@@ -76,21 +76,12 @@ jobs:
         working-directory: ./frontend
         run: npm ci
 
-      - name: Start backend
-        working-directory: ./backend
-        env:
-          MONGO_URI: ${{ secrets.E2E_MONGO_URI }}
-        run: npm run dev:e2e &
-
-      - name: Start frontend
-        working-directory: ./frontend
-        run: npm run dev:e2e &
-
       - name: Install Playwright browser
         working-directory: ./frontend
         run: npx playwright install --with-deps chromium
 
-      - name: Run Playwright test
+      - name: Run E2E tests
         working-directory: ./frontend
+        env:
+          MONGO_URI: ${{ secrets.E2E_MONGO_URI }}
         run: npx playwright test
-        
