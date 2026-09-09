@@ -89,3 +89,13 @@ jobs:
           CLIENT_URL: ${{ secrets.E2E_CLIENT_URL }}
           PORT: 1100
         run: npx playwright test
+
+  docker-build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Build Docker images
+        run: docker compose build
