@@ -88,6 +88,7 @@ jobs:
           BETTER_AUTH_URL: ${{ secrets.E2E_BETTER_AUTH_URL }}
           CLIENT_URL: ${{ secrets.E2E_CLIENT_URL }}
           PORT: 1100
+          VITE_API_URL: http://localhost:1100
         run: npx playwright test
 
   docker-build:
