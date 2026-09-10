@@ -4,12 +4,22 @@ import { mongodbAdapter } from "better-auth/adapters/mongodb";
 import { client, db } from "../config/db.js";
 
 export const auth = betterAuth({
-  database: mongodbAdapter(db, {
-    client,
-  }),
-  trustedOrigins: [process.env.CLIENT_URL || "http://localhost:5173"],
+  database: mongodbAdapter(db, { client }),
+
+  trustedOrigins: [
+    process.env.CLIENT_URL || "http://localhost:5173",
+  ],
+
   emailAndPassword: {
     enabled: true,
   },
+
+  advanced: {
+    defaultCookieAttributes: {
+      sameSite: "none",
+      secure: true,
+    },
+  },
+
   plugins: [username()],
 });
