@@ -5,10 +5,14 @@ services:
 
     env_file:
       - ./backend/.env
+    ports:
+      - "1099:1099"
 
   frontend:
     build:
       context: ./frontend
+      args:
+        VITE_API_URL: http://localhost:1099
 
     ports:
       - "8080:80"
